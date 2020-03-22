@@ -80,8 +80,12 @@ class ConsoleReporter(Reporter):
             global_table = AsciiTable(report_analyzer_global(parser, analyzer.meta_global))
             print(global_table.table)
 
-            log_table = AsciiTable(report_analyzer_level(analyzer.log_meta))
+            log_levels_table = report_analyzer_level(analyzer.log_meta)
+            print("Nb of loggers used: ", blueify(len(log_levels_table) - 1))
+            log_table = AsciiTable(log_levels_table)
             print(log_table.table)
 
-            thread_table = AsciiTable(report_analyzer_level(analyzer.thread_meta))
+            thread_level_table = report_analyzer_level(analyzer.thread_meta)
+            print("Nb of thread that logged: ", blueify(len(thread_level_table) - 1))
+            thread_table = AsciiTable(thread_level_table)
             print(thread_table.table)

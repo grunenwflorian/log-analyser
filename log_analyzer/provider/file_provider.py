@@ -14,6 +14,7 @@ class FileProvider(Provider):
         super().__init__(FileProvider.NAME)
         self.path = args["path"]
         self.file = None
+        self.iter = None
 
     def __iter__(self):
         self.file = open(self.path, "r")
