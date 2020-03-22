@@ -1,5 +1,6 @@
 from log_analyzer.analyzer.log_analyzer import LogAnalyzer
 from log_analyzer.console.console import ConsoleReporter
+from log_analyzer.csv.csv import CsvReporter
 from log_analyzer.parser.log4j2_parser import Log4j2Parser
 from log_analyzer.printer.printer import PrinterAction, PrinterReporter
 from log_analyzer.provider import FileProvider
@@ -109,5 +110,6 @@ def _init_default_actions():
 def _init_default_reporters():
     return {
         PrinterReporter.NAME: PrinterReporter,
-        ConsoleReporter.NAME: ConsoleReporter
+        ConsoleReporter.NAME: ConsoleReporter,
+        CsvReporter.NAME: CsvReporter
     }
