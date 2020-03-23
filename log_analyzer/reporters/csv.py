@@ -19,34 +19,26 @@ def create_analyzer_global_row(parser_opts):
     ]
 
 
+def create_log_thread_report(analyzer):
+    nb_logger = len(analyzer.log_meta.keys())
+    nb_thread = len(analyzer.thread_meta.keys())
+    return nb_logger, nb_thread
+
+
 class CsvReporter(Reporter):
     NAME = "CsvReporter"
 
     def analyze(self, report):
-        self.analyze_stats(report)
-        with open('error_graph.csv', 'w', newline='') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
-            if "analyzer" in report:
-                analyzer = report["analyzer"]
-                for meta_error in analyzer.meta_global.meta_errors:
-                    spamwriter.writerow([meta_error["date"].isoformat()])
-
-    def analyze_stats(self, report):
         with open('stats.csv', 'a', newline='') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            writer = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             row = []
             if "parser" in report:
-                parser_csv = create_parser_row(report["parser"])
-                row += parser_csv
+                row += create_parser_row(report["parser"])
 
             if "analyzer" in report:
                 analyzer = report["analyzer"]
-                global_meta_csv = create_analyzer_global_row(analyzer.meta_global)
-                row += global_meta_csv
+                row += create_analyzer_global_row(analyzer.meta_global)
+                row += create_log_thread_report(analyzer)
 
-                nb_logger = len(analyzer.log_meta.keys())
-                nb_thread = len(analyzer.thread_meta.keys())
-                row += [nb_logger, nb_thread]
-
-            spamwriter.writerow(row)
+            writer.writerow(row)

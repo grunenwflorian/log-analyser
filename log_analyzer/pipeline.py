@@ -1,3 +1,4 @@
+from log_analyzer.actions.csv import CsvSaver
 from log_analyzer.provider.file import FileProvider
 
 from log_analyzer.actions.analyzer.log import LogAnalyzer
@@ -22,13 +23,14 @@ class ActionsExecutor(object):
         for line in self.provider:
             self._process_actions(line, report)
 
+        for action in self.actions:
+            action.clean()
+
         for reporter in self.reporters:
             reporter.analyze(report)
 
     def _process_actions(self, line, report):
-        data = {
-            "provider": line,
-        }
+        data = {"provider": line}
         for action in self.actions:
             action.process(data, report)
 
@@ -106,7 +108,8 @@ def _init_default_actions():
     return {
         PrinterAction.NAME: PrinterAction,
         GrokParser.NAME: GrokParser,
-        LogAnalyzer.NAME: LogAnalyzer
+        LogAnalyzer.NAME: LogAnalyzer,
+        CsvSaver.NAME: CsvSaver
     }
 
 

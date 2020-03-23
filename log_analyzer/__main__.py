@@ -1,6 +1,7 @@
 import argparse
 import logging
 
+from log_analyzer.actions.csv import CsvSaver
 from log_analyzer.pipeline import ActionsReifier, ActionsExecutor
 
 from log_analyzer.reporters.console import ConsoleReporter
@@ -37,6 +38,7 @@ if __name__ == "__main__":
         "actions": [
             {"name": GrokParser.NAME},
             {"name": LogAnalyzer.NAME},
+            {"name": CsvSaver.NAME},
             {"name": PrinterAction.NAME, "data": False, "report": False}
         ],
         "reporters": [

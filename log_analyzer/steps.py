@@ -17,6 +17,9 @@ class Action:
     def process(self, data: Dict[str, Any], report):
         pass
 
+    def clean(self):
+        pass
+
 
 class Reporter:
     def __init__(self, args: Dict[str, Any]):
