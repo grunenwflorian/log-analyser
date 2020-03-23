@@ -18,4 +18,6 @@ venv/
 *.iml
 .idea/
 
-var/
+data/
+*.csv
+draw.py

@@ -1,9 +1,12 @@
-from log_analyzer.analyzer.log_analyzer import LogAnalyzer
-from log_analyzer.console.console import ConsoleReporter
-from log_analyzer.csv.csv import CsvReporter
-from log_analyzer.parser.log4j2_parser import Log4j2Parser
-from log_analyzer.printer.printer import PrinterAction, PrinterReporter
-from log_analyzer.provider import FileProvider
+from log_analyzer.provider.file import FileProvider
+
+from log_analyzer.actions.analyzer.log import LogAnalyzer
+from log_analyzer.actions.parser.grok import GrokParser
+from log_analyzer.actions.printer import PrinterAction
+
+from log_analyzer.reporters.csv import CsvReporter
+from log_analyzer.reporters.console import ConsoleReporter
+from log_analyzer.reporters.printer import PrinterReporter
 
 
 class ActionsExecutor(object):
@@ -102,7 +105,7 @@ def _init_default_provider():
 def _init_default_actions():
     return {
         PrinterAction.NAME: PrinterAction,
-        Log4j2Parser.NAME: Log4j2Parser,
+        GrokParser.NAME: GrokParser,
         LogAnalyzer.NAME: LogAnalyzer
     }
 

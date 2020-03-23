@@ -23,6 +23,16 @@ class CsvReporter(Reporter):
     NAME = "CsvReporter"
 
     def analyze(self, report):
+        self.analyze_stats(report)
+        with open('error_graph.csv', 'w', newline='') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+            if "analyzer" in report:
+                analyzer = report["analyzer"]
+                for meta_error in analyzer.meta_global.meta_errors:
+                    spamwriter.writerow([meta_error["date"].isoformat()])
+
+    def analyze_stats(self, report):
         with open('stats.csv', 'a', newline='') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             row = []

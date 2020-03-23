@@ -1,13 +1,16 @@
 import argparse
 import logging
 
-from log_analyzer.analyzer.log_analyzer import LogAnalyzer
-from log_analyzer.console.console import ConsoleReporter
-from log_analyzer.csv.csv import CsvReporter
-from log_analyzer.parser.log4j2_parser import Log4j2Parser
-from log_analyzer.printer.printer import PrinterAction, PrinterReporter
-from log_analyzer.provider import FileProvider
 from log_analyzer.pipeline import ActionsReifier, ActionsExecutor
+
+from log_analyzer.reporters.console import ConsoleReporter
+from log_analyzer.reporters.csv import CsvReporter
+
+from log_analyzer.actions.analyzer.log import LogAnalyzer
+from log_analyzer.actions.parser.grok import GrokParser
+from log_analyzer.actions.printer import PrinterAction
+
+from log_analyzer.provider.file import FileProvider
 
 
 logger = logging.getLogger(__name__)
@@ -32,12 +35,12 @@ if __name__ == "__main__":
     models = ActionsReifier().reify_model({
         "provider": {"name": FileProvider.NAME, "path": args["file"]},
         "actions": [
-            {"name": Log4j2Parser.NAME},
+            {"name": GrokParser.NAME},
             {"name": LogAnalyzer.NAME},
             {"name": PrinterAction.NAME, "data": False, "report": False}
         ],
         "reporters": [
-            #{"name": PrinterReporter.NAME},
+            # {"name": PrinterReporter.NAME},
             {"name": ConsoleReporter.NAME},
             {"name": CsvReporter.NAME},
         ]

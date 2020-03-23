@@ -20,13 +20,6 @@ class PrinterAction(Action):
             print("Temp Report : ", json.dumps(report, cls=DictEncoder))
 
 
-class PrinterReporter(Reporter):
-    NAME = "PrintReporter"
-
-    def analyze(self, report):
-        print("Report : ", json.dumps(report, cls=DictEncoder))
-
-
 class DictEncoder(JSONEncoder):
 
     def default(self, o):

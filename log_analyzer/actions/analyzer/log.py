@@ -17,25 +17,29 @@ class LogAnalyzer(Action):
         parsed_logs = data["parser"]
 
         level = parsed_logs["level"]
-        levelToLambda[level](self.log_report.meta_global)
+        levelToLambda[level](self.log_report.meta_global, parsed_logs)
 
-        log_name = parsed_logs["log_name"]
-        if log_name not in self.log_report.log_meta:
-            self.log_report.log_meta[log_name] = LevelReporter()
-        log_meta = self.log_report.log_meta[log_name]
-        levelToLambda[level](log_meta)
+        if "log_name" in parsed_logs:
+            self._update_log_report(level, parsed_logs)
 
         if "thread" in parsed_logs:
             self._update_thread_report(level, parsed_logs)
 
         report["analyzer"] = self.log_report
 
+    def _update_log_report(self, level, parsed_logs):
+        log_name = parsed_logs["log_name"]
+        if log_name not in self.log_report.log_meta:
+            self.log_report.log_meta[log_name] = LevelReporter()
+        log_meta = self.log_report.log_meta[log_name]
+        levelToLambda[level](log_meta, None)
+
     def _update_thread_report(self, level, parsed_logs):
         thread_name = parsed_logs["thread"]
         if thread_name not in self.log_report.thread_meta:
             self.log_report.thread_meta[thread_name] = LevelReporter()
         thread_meta = self.log_report.thread_meta[thread_name]
-        levelToLambda[level](thread_meta)
+        levelToLambda[level](thread_meta, None)
 
 
 class Report(object):
@@ -53,25 +57,31 @@ class LevelReporter(object):
         self.warn = 0
         self.debug = 0
         self.error = 0
+        self.meta_errors = []
 
     def __iter__(self):
         for attr, value in self.__dict__.items():
             yield attr, value
 
-def info(meta):
+
+def info(meta, _):
     meta.info += 1
 
 
-def debug(meta):
+def debug(meta, _):
     meta.debug += 1
 
 
-def warn(meta):
+def warn(meta, _):
     meta.warn += 1
 
 
-def error(meta):
+def error(meta, parsed_logs):
     meta.error += 1
+    if parsed_logs:
+        date = parsed_logs["date"]
+        message = parsed_logs["message"]
+        meta.meta_errors.append({"date": date, "message": message})
 
 
 levelToLambda = {
@@ -80,4 +90,3 @@ levelToLambda = {
     "WARN": warn,
     "ERROR": error
 }
-
