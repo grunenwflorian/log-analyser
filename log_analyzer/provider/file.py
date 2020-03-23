@@ -1,13 +1,13 @@
 from typing import Dict
 
-from ..steps import Provider
+from log_analyzer.steps import Provider
 
 
 class FileProvider(Provider):
     NAME = "File"
 
     def __init__(self, args: Dict[str, str]):
-        super().__init__(FileProvider.NAME)
+        super().__init__(args)
         self.path = args["path"]
         self.file = None
         self.iter = None

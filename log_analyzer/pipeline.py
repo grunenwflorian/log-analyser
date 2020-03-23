@@ -4,6 +4,7 @@ from log_analyzer.provider.file import FileProvider
 from log_analyzer.actions.analyzer.log import LogAnalyzer
 from log_analyzer.actions.parser.grok import GrokParser
 from log_analyzer.actions.printer import PrinterAction
+from log_analyzer.provider.url import UrlProvider
 
 from log_analyzer.reporters.csv import CsvReporter
 from log_analyzer.reporters.console import ConsoleReporter
@@ -114,7 +115,8 @@ class ActionsReifier:
 
 def _init_default_provider():
     return {
-        FileProvider.NAME: FileProvider
+        FileProvider.NAME: FileProvider,
+        UrlProvider.NAME: UrlProvider
     }
 
 

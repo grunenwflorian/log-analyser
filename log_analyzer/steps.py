@@ -34,8 +34,8 @@ class Reporter:
 
 
 class Provider:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, args):
+        self.name = args["name"]
 
     @abstractmethod
     def __iter__(self):
