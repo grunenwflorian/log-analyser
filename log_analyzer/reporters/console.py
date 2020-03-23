@@ -40,7 +40,7 @@ def report_analyzer_global(parser_opts, glob):
     parsed_lines = parser_opts["parsed_lines"]
     info, warn, debug, error = glob.info, glob.warn, glob.debug, glob.error
     table_data = [
-        ["Level", "Np", "Percent/analyzed", "Percent/viewed"],
+        ["Level", "Nb", "Percent/analyzed", "Percent/viewed"],
         ["Info", info, percent(info, parsed_lines), percent(info, all_lines)],
         [yellowify("Warn"), warn, percent(warn, parsed_lines), percent(warn, all_lines)],
         ["Debug", debug, percent(debug, parsed_lines), percent(debug, all_lines)],
