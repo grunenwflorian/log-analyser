@@ -17,7 +17,7 @@ class LogAnalyzer(Action):
         parsed_logs = data["parser"]
 
         level = parsed_logs["level"]
-        LEVEL_TO_LAMBDA[level](self.log_report.glob, parsed_logs)
+        LEVEL_TO_LAMBDA[level](self.log_report.glob, None)
 
         if "log_name" in parsed_logs:
             self._update_log_report(level, parsed_logs)
@@ -32,7 +32,7 @@ class LogAnalyzer(Action):
         if log_name not in self.log_report.log:
             self.log_report.add_logger(log_name, LevelReporter())
         log_reporter = self.log_report.logger_reporter(log_name)
-        LEVEL_TO_LAMBDA[level](log_reporter, None)
+        LEVEL_TO_LAMBDA[level](log_reporter, parsed_logs)
 
     def _update_thread_report(self, level, parsed_logs):
         thread_name = parsed_logs["thread"]

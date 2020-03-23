@@ -34,7 +34,7 @@ if __name__ == "__main__":
     ]
 
     models = ActionsReifier().reify_model({
-        "provider": {"name": UrlProvider.NAME, "url": args["file"]},
+        "provider": {"name": UrlProvider.NAME, "url": "https://macpro.fr.murex.com/ci/job/kubypop-deploy/job/2020_03_19-15_17_06-36606883/1646/artifact/kubypop/logs/kube_bff.log"},
         "actions": [
             {"name": GrokParser.NAME, "patterns": bff_patterns},
             {"name": LogAnalyzer.NAME},

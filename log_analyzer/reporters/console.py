@@ -3,6 +3,7 @@ import operator
 from terminaltables import AsciiTable
 from colorclass import Color
 
+from log_analyzer.actions.analyzer.log import LevelReporter
 from log_analyzer.steps import Reporter
 
 
@@ -35,7 +36,7 @@ def percent(val, all_val):
     return (val / all_val) * 100
 
 
-def report_analyzer_global(parser_opts, glob):
+def report_analyzer_global(parser_opts, glob: LevelReporter):
     all_lines = parser_opts["all_lines"]
     parsed_lines = parser_opts["parsed_lines"]
     info, warn, debug, error = glob.info, glob.warn, glob.debug, glob.error
@@ -49,23 +50,29 @@ def report_analyzer_global(parser_opts, glob):
     return table_data
 
 
-def report_analyzer_level(level_meta):
+def report_analyzer_level(level_reporter):
     table_data = []
-    for log, value in level_meta.items():
+    error_data = []
+    for log, reporter in level_reporter.items():
         colored_log = log
 
-        if value.warn > 0:
+        if reporter.warn > 0:
             colored_log = yellowify(log)
 
-        if value.error > 0:
+        if reporter.error > 0:
             colored_log = redify(log)
 
-        table_data.append([colored_log, value.info, value.warn, value.debug, value.error])
+        row = [colored_log, reporter.info, reporter.warn, reporter.debug, reporter.error]
+        table_data.append(row)
+
+        for errors in reporter.meta_errors:
+            error_data.append([redify(log), errors["message"], errors["date"]])
 
     table_data.sort(key=operator.itemgetter(4, 2, 1, 3), reverse=True)
 
     table_data.insert(0, ["Logger Name", "Info", "Warn", "Debug", "Error"])
-    return table_data
+    error_data.insert(0, ["Logger Name", "Message", "Time"])
+    return table_data, error_data
 
 
 class ConsoleReporter(Reporter):
@@ -82,12 +89,16 @@ class ConsoleReporter(Reporter):
             global_table = AsciiTable(report_analyzer_global(parser, analyzer.glob))
             print(global_table.table)
 
-            log_levels_table = report_analyzer_level(analyzer.log)
+            log_levels_table, error_message_table = report_analyzer_level(analyzer.log)
             print("Nb of loggers used: ", blueify(len(log_levels_table) - 1))
             log_table = AsciiTable(log_levels_table)
             print(log_table.table)
 
-            thread_level_table = report_analyzer_level(analyzer.thread)
+            thread_level_table, _ = report_analyzer_level(analyzer.thread)
             print("Nb of thread that logged: ", blueify(len(thread_level_table) - 1))
             thread_table = AsciiTable(thread_level_table)
             print(thread_table.table)
+
+            print("Loggers with messages:")
+            error_table = AsciiTable(error_message_table)
+            print(error_table.table)

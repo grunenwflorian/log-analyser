@@ -16,8 +16,8 @@ class GrokParser(Action):
 
     def process(self, data: Dict[str, Any], report):
         line = data["provider"]
-
         self.report["all_lines"] += 1
+
         for grok_parser in self.groks:
             parsed_log = grok_parser.match(line)
 

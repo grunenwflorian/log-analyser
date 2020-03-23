@@ -10,10 +10,12 @@ class UrlProvider(Provider):
         super().__init__(args)
         self.url = args["url"]
         self.iter = None
+        self.req = None
 
     def __iter__(self):
-        self.iter = iter(requests.get(self.url, stream=True).iter_lines())
+        self.req = requests.get(self.url, stream=True)
+        self.iter = iter(self.req.iter_lines())
         return self
 
     def __next__(self):
-        return str(next(self.iter))
+        return str(next(self.iter), self.req.encoding)
