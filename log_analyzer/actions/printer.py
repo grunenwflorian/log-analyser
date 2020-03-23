@@ -12,12 +12,15 @@ class PrinterAction(Action):
         super().__init__(args)
         self.data = bool(args["data"]) if ("data" in args) else True
         self.report = bool(args["report"]) if ("report" in args) else True
+        self.log = bool(args["log"]) if ("log" in args) else False
 
     def process(self, data: Dict[str, Any], report):
         if self.data:
             print("Data : ", json.dumps(data, cls=DictEncoder), end="")
         if self.report:
             print("Temp Report : ", json.dumps(report, cls=DictEncoder))
+        if self.log:
+            print(data["provider"])
 
 
 class DictEncoder(JSONEncoder):

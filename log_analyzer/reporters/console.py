@@ -38,7 +38,7 @@ def percent(val, all_val):
 def report_analyzer_global(parser_opts, glob):
     all_lines = parser_opts["all_lines"]
     parsed_lines = parser_opts["parsed_lines"]
-    info = glob.info, warn = glob.warn, debug = glob.debug, error = glob.error
+    info, warn, debug, error = glob.info, glob.warn, glob.debug, glob.error
     table_data = [
         ["Level", "Np", "Percent/analyzed", "Percent/viewed"],
         ["Info", info, percent(info, parsed_lines), percent(info, all_lines)],
