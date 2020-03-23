@@ -29,7 +29,18 @@ class Reporter:
     def analyze(self, report):
         pass
 
+    def clean(self):
+        pass
+
 
 class Provider:
     def __init__(self, name):
         self.name = name
+
+    @abstractmethod
+    def __iter__(self):
+        pass
+
+    @abstractmethod
+    def __next__(self):
+        pass

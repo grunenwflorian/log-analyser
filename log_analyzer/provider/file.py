@@ -1,10 +1,6 @@
-import logging
 from typing import Dict
 
 from ..steps import Provider
-
-
-logger = logging.getLogger(__name__)
 
 
 class FileProvider(Provider):

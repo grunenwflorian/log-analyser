@@ -1,5 +1,4 @@
 import argparse
-import logging
 
 from log_analyzer.actions.csv import CsvSaver
 from log_analyzer.pipeline import ActionsReifier, ActionsExecutor
@@ -12,9 +11,6 @@ from log_analyzer.actions.parser.grok import GrokParser
 from log_analyzer.actions.printer import PrinterAction
 
 from log_analyzer.provider.file import FileProvider
-
-
-logger = logging.getLogger(__name__)
 
 
 def create_argument_parser():
@@ -33,10 +29,15 @@ if __name__ == "__main__":
 
     args = vars(cmdline_args)
 
+    bff_patterns = [
+        r"%{INT:year}-%{INT:month}-%{INT:day} %{HOUR:hour}:%{MINUTE:minute}:%{SECOND:second},%{INT:milli} \[%{DATA:thread}\] %{WORD:level}\s{1,2}%{DATA:log_name} - %{GREEDYDATA:message}",
+        r"%{INT:year}-%{INT:month}-%{INT:day} %{HOUR:hour}:%{MINUTE:minute}:%{SECOND:second} %{WORD:level}\s{1,2}%{DATA:log_name} %{IP:ip} - %{GREEDYDATA:message}"
+    ]
+
     models = ActionsReifier().reify_model({
         "provider": {"name": FileProvider.NAME, "path": args["file"]},
         "actions": [
-            {"name": GrokParser.NAME},
+            {"name": GrokParser.NAME, "patterns": bff_patterns},
             {"name": LogAnalyzer.NAME},
             {"name": CsvSaver.NAME},
             {"name": PrinterAction.NAME, "data": False, "report": False}
@@ -47,5 +48,4 @@ if __name__ == "__main__":
             {"name": CsvReporter.NAME},
         ]
     })
-
     ActionsExecutor(models).execute()

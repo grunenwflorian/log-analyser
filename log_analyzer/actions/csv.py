@@ -11,7 +11,8 @@ class CsvSaver(Action):
         super().__init__(args)
         file_name = args["file"] if "file" in args else "log_series.csv"
         self.csv_file = open(file_name, "w")
-        self.writer = csv.writer(self.csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        self.writer = csv.writer(
+            self.csv_file, delimiter=',')
 
     def process(self, data: Dict[str, Any], _):
         if "parser" not in data:
@@ -22,4 +23,3 @@ class CsvSaver(Action):
     def clean(self):
         super().clean()
         self.csv_file.close()
-

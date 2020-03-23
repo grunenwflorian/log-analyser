@@ -23,27 +23,28 @@ def greenify(elem):
 
 
 def report_parser(opts):
-    line_viewed = opts["line_viewed"]
-    parsed_line = opts["parsed_line"]
+    line_viewed = opts["all_lines"]
+    parsed_line = opts["parsed_lines"]
     percent_viewed = (parsed_line / line_viewed) * 100
     return "Nb Lines analyzed: " + greenify(parsed_line) + \
            ", Nb Lines viewed: " + redify(line_viewed) + \
            ", Percent analyzed : " + blueify(percent_viewed)
 
 
-def make_percent(val, all):
-    return (val / all) * 100
+def percent(val, all_val):
+    return (val / all_val) * 100
 
 
-def report_analyzer_global(parser_opts, meta_global):
-    line_viewed = parser_opts["line_viewed"]
-    parsed_line = parser_opts["parsed_line"]
+def report_analyzer_global(parser_opts, glob):
+    all_lines = parser_opts["all_lines"]
+    parsed_lines = parser_opts["parsed_lines"]
+    info = glob.info, warn = glob.warn, debug = glob.debug, error = glob.error
     table_data = [
         ["Level", "Np", "Percent/analyzed", "Percent/viewed"],
-        ["Info", meta_global.info, make_percent(meta_global.info, parsed_line), make_percent(meta_global.info, line_viewed)],
-        [yellowify("Warn"), meta_global.warn, make_percent(meta_global.warn, parsed_line), make_percent(meta_global.warn, line_viewed)],
-        ["Debug", meta_global.debug, make_percent(meta_global.debug, parsed_line), make_percent(meta_global.debug, line_viewed)],
-        [redify("Error"), meta_global.error, make_percent(meta_global.error, parsed_line), make_percent(meta_global.error, line_viewed)]
+        ["Info", info, percent(info, parsed_lines), percent(info, all_lines)],
+        [yellowify("Warn"), warn, percent(warn, parsed_lines), percent(warn, all_lines)],
+        ["Debug", debug, percent(debug, parsed_lines), percent(debug, all_lines)],
+        [redify("Error"), error, percent(error, parsed_lines), percent(error, all_lines)]
     ]
     return table_data
 
@@ -73,19 +74,20 @@ class ConsoleReporter(Reporter):
     def analyze(self, report):
         if "parser" in report:
             print(report_parser(report["parser"]))
+
         if "analyzer" in report:
             # analyzer without parser not allowed
             parser = report["parser"]
             analyzer = report["analyzer"]
-            global_table = AsciiTable(report_analyzer_global(parser, analyzer.meta_global))
+            global_table = AsciiTable(report_analyzer_global(parser, analyzer.glob))
             print(global_table.table)
 
-            log_levels_table = report_analyzer_level(analyzer.log_meta)
+            log_levels_table = report_analyzer_level(analyzer.log)
             print("Nb of loggers used: ", blueify(len(log_levels_table) - 1))
             log_table = AsciiTable(log_levels_table)
             print(log_table.table)
 
-            thread_level_table = report_analyzer_level(analyzer.thread_meta)
+            thread_level_table = report_analyzer_level(analyzer.thread)
             print("Nb of thread that logged: ", blueify(len(thread_level_table) - 1))
             thread_table = AsciiTable(thread_level_table)
             print(thread_table.table)

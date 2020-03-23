@@ -4,8 +4,8 @@ from log_analyzer.steps import Reporter
 
 
 def create_parser_row(opts):
-    line_viewed = opts["line_viewed"]
-    parsed_line = opts["parsed_line"]
+    line_viewed = opts["all_lines"]
+    parsed_line = opts["parsed_lines"]
     percent_viewed = (parsed_line / line_viewed) * 100
     return [line_viewed, parsed_line, percent_viewed]
 
@@ -20,8 +20,8 @@ def create_analyzer_global_row(parser_opts):
 
 
 def create_log_thread_report(analyzer):
-    nb_logger = len(analyzer.log_meta.keys())
-    nb_thread = len(analyzer.thread_meta.keys())
+    nb_logger = len(analyzer.log.keys())
+    nb_thread = len(analyzer.thread.keys())
     return nb_logger, nb_thread
 
 
@@ -38,7 +38,7 @@ class CsvReporter(Reporter):
 
             if "analyzer" in report:
                 analyzer = report["analyzer"]
-                row += create_analyzer_global_row(analyzer.meta_global)
+                row += create_analyzer_global_row(analyzer.glob)
                 row += create_log_thread_report(analyzer)
 
             writer.writerow(row)

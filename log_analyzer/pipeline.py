@@ -10,7 +10,7 @@ from log_analyzer.reporters.console import ConsoleReporter
 from log_analyzer.reporters.printer import PrinterReporter
 
 
-class ActionsExecutor(object):
+class ActionsExecutor:
 
     def __init__(self, models):
         self.provider = models.provider
@@ -35,12 +35,21 @@ class ActionsExecutor(object):
             action.process(data, report)
 
 
-class Model(object):
+class Model:
 
     def __init__(self):
         self.provider = None
         self.actions = []
         self.reporters = []
+
+    def set_provider(self, provider):
+        self.provider = provider
+
+    def add_action(self, action):
+        self.actions.append(action)
+
+    def add_reporter(self, reporter):
+        self.reporters.append(reporter)
 
 
 class ActionsReifier:
@@ -64,38 +73,43 @@ class ActionsReifier:
         if "provider" not in args:
             raise ValueError("No data provider were provided")
 
+        self._reify_provider(args, models)
+
+        if "actions" not in args:
+            return models
+        self._reify_model_actions(args, models)
+
+        if "reporters" not in args:
+            return models
+        self._reify_model_reporters(args, models)
+
+        return models
+
+    def _reify_provider(self, args, model: Model):
         args_provider = args["provider"]
         provider_name = args_provider["name"]
         if provider_name not in self._providers:
             raise ValueError("No provider associated with the name " + provider_name)
         provider = self._providers[provider_name]
-        models.provider = provider(args_provider)
+        model.set_provider(provider(args_provider))
 
-        if "actions" not in args:
-            # TODO handle validation
-            return models
+    def _reify_model_actions(self, args, model: Model):
         user_actions = args["actions"]
-
-        for action in user_actions:
-            action_name = action["name"]
+        for action_conf in user_actions:
+            action_name = action_conf["name"]
             if action_name not in self._actions:
-                raise ValueError("No action associated with the name " + action_name)
-            _action = self._actions[action_name](action)
-            models.actions.append(_action)
+                raise ValueError("No action_conf associated with the name " + action_name)
+            action = self._actions[action_name](action_conf)
+            model.add_action(action)
 
-        if "reporters" not in args:
-            # TODO handle validation
-            return models
+    def _reify_model_reporters(self, args, model: Model):
         user_reporters = args["reporters"]
-
-        for reporter in user_reporters:
-            reporter_name = reporter["name"]
+        for reporter_conf in user_reporters:
+            reporter_name = reporter_conf["name"]
             if reporter_name not in self._reporters:
-                raise ValueError("No reporter associated with the name " + reporter_name)
-            _reporter = self._reporters[reporter_name](reporter)
-            models.reporters.append(_reporter)
-
-        return models
+                raise ValueError("No reporter_conf associated with the name " + reporter_name)
+            reporter = self._reporters[reporter_name](reporter_conf)
+            model.add_reporter(reporter)
 
 
 def _init_default_provider():

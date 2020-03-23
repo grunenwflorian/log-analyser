@@ -12,6 +12,5 @@ class PrinterReporter(Reporter):
 
 class DictEncoder(JSONEncoder):
 
-    def default(self, o):
+    def default(self, o):  # pylint: disable=method-hidden
         return o.__dict__
-

@@ -17,7 +17,7 @@ class LogAnalyzer(Action):
         parsed_logs = data["parser"]
 
         level = parsed_logs["level"]
-        levelToLambda[level](self.log_report.meta_global, parsed_logs)
+        LEVEL_TO_LAMBDA[level](self.log_report.glob, parsed_logs)
 
         if "log_name" in parsed_logs:
             self._update_log_report(level, parsed_logs)
@@ -29,28 +29,20 @@ class LogAnalyzer(Action):
 
     def _update_log_report(self, level, parsed_logs):
         log_name = parsed_logs["log_name"]
-        if log_name not in self.log_report.log_meta:
-            self.log_report.log_meta[log_name] = LevelReporter()
-        log_meta = self.log_report.log_meta[log_name]
-        levelToLambda[level](log_meta, None)
+        if log_name not in self.log_report.log:
+            self.log_report.add_logger(log_name, LevelReporter())
+        log_reporter = self.log_report.logger_reporter(log_name)
+        LEVEL_TO_LAMBDA[level](log_reporter, None)
 
     def _update_thread_report(self, level, parsed_logs):
         thread_name = parsed_logs["thread"]
-        if thread_name not in self.log_report.thread_meta:
-            self.log_report.thread_meta[thread_name] = LevelReporter()
-        thread_meta = self.log_report.thread_meta[thread_name]
-        levelToLambda[level](thread_meta, None)
+        if thread_name not in self.log_report.thread:
+            self.log_report.add_thread(thread_name, LevelReporter())
+        thread_reporter = self.log_report.thread_reporter(thread_name)
+        LEVEL_TO_LAMBDA[level](thread_reporter, None)
 
 
-class Report(object):
-
-    def __init__(self) -> None:
-        self.meta_global = LevelReporter()
-        self.log_meta = {}
-        self.thread_meta = {}
-
-
-class LevelReporter(object):
+class LevelReporter:
 
     def __init__(self) -> None:
         self.info = 0
@@ -64,27 +56,47 @@ class LevelReporter(object):
             yield attr, value
 
 
-def info(meta, _):
-    meta.info += 1
+class Report:
+
+    def __init__(self) -> None:
+        self.glob = LevelReporter()
+        self.log = {}
+        self.thread = {}
+
+    def add_logger(self, log_name, level_report: LevelReporter) -> None:
+        self.log[log_name] = level_report
+
+    def logger_reporter(self, log_name) -> LevelReporter:
+        return self.log[log_name]
+
+    def add_thread(self, thread_name, level_report: LevelReporter) -> None:
+        self.thread[thread_name] = level_report
+
+    def thread_reporter(self, thread_name) -> LevelReporter:
+        return self.thread[thread_name]
 
 
-def debug(meta, _):
-    meta.debug += 1
+def info(reporter, _):
+    reporter.info += 1
 
 
-def warn(meta, _):
-    meta.warn += 1
+def debug(reporter, _):
+    reporter.debug += 1
 
 
-def error(meta, parsed_logs):
-    meta.error += 1
+def warn(reporter, _):
+    reporter.warn += 1
+
+
+def error(reporter, parsed_logs):
+    reporter.error += 1
     if parsed_logs:
         date = parsed_logs["date"]
         message = parsed_logs["message"]
-        meta.meta_errors.append({"date": date, "message": message})
+        reporter.meta_errors.append({"date": date, "message": message})
 
 
-levelToLambda = {
+LEVEL_TO_LAMBDA = {
     "INFO": info,
     "DEBUG": debug,
     "WARN": warn,

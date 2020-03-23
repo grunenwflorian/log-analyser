@@ -2,7 +2,7 @@ import json
 from json import JSONEncoder
 from typing import Dict, Any
 
-from log_analyzer.steps import Action, Reporter
+from log_analyzer.steps import Action
 
 
 class PrinterAction(Action):
@@ -22,6 +22,5 @@ class PrinterAction(Action):
 
 class DictEncoder(JSONEncoder):
 
-    def default(self, o):
+    def default(self, o):  # pylint: disable=method-hidden
         return o.__dict__
-
